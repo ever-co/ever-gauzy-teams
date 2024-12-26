@@ -8,13 +8,28 @@ export interface IRejectSelectedModalProps {
 	onReject: (reason: string) => void;
 	minReasonLength?: number;
 	maxReasonLength?: number;
+	selectTimesheetId?: string[];
 }
+/**
+ * A modal component that allows the user to reject selected timesheet entries.
+ * It requires a string reason for the rejection and shows a text area to input the reason.
+ * The component also displays a count of the number of characters left to type and a cancel button.
+ * The confirmation button is only enabled when the reason is not empty and the character count is within the limits.
+ * The component also shows a loading state while the rejection is being processed.
+ * @param {boolean} isOpen - Whether the modal is open or not.
+ * @param {Function} closeModal - The function to call when the modal is closed.
+ * @param {number} maxReasonLength - The maximum allowed length of the reason string.
+ * @param {Function} onReject - The function to call when the confirmation button is clicked.
+ * @param {number} minReasonLength - The minimum allowed length of the reason string.
+ * @param {string[]} selectTimesheetId - The IDs of the timesheet entries that are being rejected.
+ */
 export function RejectSelectedModal({
 	isOpen,
 	closeModal,
 	maxReasonLength,
 	onReject,
-	minReasonLength
+	minReasonLength,
+	selectTimesheetId
 }: IRejectSelectedModalProps) {
 	const [isSubmitting, setIsSubmitting] = useState(false);
 	const [reason, setReason] = useState('');

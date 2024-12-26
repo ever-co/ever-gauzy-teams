@@ -47,14 +47,18 @@ export function useTimelogFilterOptions() {
     const handleSelectRowByStatusAndDate = (logs: TimesheetLog[], isChecked: boolean) => {
         setSelectTimesheetId((prev) => {
             const logIds = logs.map((item) => item.id);
+            if (!isChecked) {
+                const allSelected = logIds.every(id => prev.includes(id));
 
-            if (isChecked) {
-                return [...new Set([...prev, ...logIds])];
-            } else {
-                return prev.filter((id) => !logIds.includes(id));
+                if (allSelected) {
+                    return prev.filter((id) => !logIds.includes(id));
+                } else {
+                    return [...new Set([...prev, ...logIds])];
+                }
             }
+            return [...new Set([...prev, ...logIds])];
         });
-    }
+    };
 
 
 

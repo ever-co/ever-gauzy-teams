@@ -74,6 +74,23 @@ export function AlertDialogConfirmation({
 
 
 
+/**
+ * A modal component that displays a confirmation dialog with a title,
+ * description, and optional count, and two buttons: "Continue" and "Cancel".
+ * The "Continue" button is disabled while the action is loading, and the
+ * "Cancel" button closes the modal.
+ *
+ * @param {boolean} open - Whether the modal is open.
+ * @param {() => void} close - A function to close the modal.
+ * @param {string} title - The title of the modal.
+ * @param {string} description - The description of the modal.
+ * @param {() => any} onAction - The action to perform when the "Continue" button is clicked.
+ * @param {boolean} loading - Whether the action is loading.
+ * @param {string} [confirmText="Continue"] - The text of the "Continue" button.
+ * @param {string} [cancelText="Cancel"] - The text of the "Cancel" button.
+ * @param {number} [countID=0] - An optional count to display next to the description.
+ * @returns {React.ReactElement} The modal component.
+ */
 export const AlertConfirmationModal = ({
     open,
     close,
