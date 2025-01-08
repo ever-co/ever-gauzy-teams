@@ -140,8 +140,13 @@ export const TotalDurationByDate = React.memo(
 		const totalDurationInSeconds = Array.isArray(filteredLogs)
 			? filteredLogs.reduce((acc, item) => {
 				const seconds = differenceBetweenHours(
-					item.startedAt instanceof Date ? item.startedAt : new Date(item.startedAt),
-					item.stoppedAt instanceof Date ? item.stoppedAt : new Date(item.stoppedAt)
+					item.timesheet.startedAt && new Date(item.timesheet.startedAt).toString() !== "Invalid Date"
+						? new Date(item.timesheet.startedAt)
+						: new Date(),
+
+					item.timesheet.stoppedAt && new Date(item.timesheet.stoppedAt).toString() !== "Invalid Date"
+						? new Date(item.timesheet.stoppedAt)
+						: new Date(),
 				)
 				return acc + seconds
 			}, 0)

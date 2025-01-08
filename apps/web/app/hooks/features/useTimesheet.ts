@@ -26,27 +26,43 @@ const groupByDate = (items: TimesheetLog[]): GroupedTimesheet[] => {
     if (!items?.length) return [];
     type GroupedMap = Record<string, TimesheetLog[]>;
     const groupedByDate = items.reduce<GroupedMap>((acc, item) => {
-        if (!item?.createdAt) {
+        if (!item?.timesheet.createdAt) {
             console.warn('Skipping item with missing timesheet or createdAt:', item);
             return acc;
         }
         try {
-            const date = new Date(item.createdAt).toISOString().split('T')[0];
+            const date = new Date(item?.timesheet.createdAt).toISOString().split('T')[0];
             if (!acc[date]) acc[date] = [];
-            acc[date].push(item);
+
+            const existingLogIndex = acc[date].findIndex(
+                log => log.timesheet.id === item.timesheet.id
+            );
+
+            if (existingLogIndex === -1) {
+                acc[date].push(item);
+            } else {
+                const existingLog = acc[date][existingLogIndex];
+                if (new Date(item.timesheet.createdAt) > new Date(existingLog.timesheet.createdAt)) {
+                    acc[date][existingLogIndex] = item;
+                }
+            }
         } catch (error) {
             console.error(
                 `Failed to process date for timesheet ${item.timesheet.id}:`,
-                { createdAt: item.createdAt, error }
+                { createdAt: item?.timesheet.createdAt, error }
             );
         }
         return acc;
     }, {});
-
     return Object.entries(groupedByDate)
-        .map(([date, tasks]) => ({ date, tasks }))
+        .map(([date, tasks]) => ({
+            date,
+            tasks: tasks.sort((a, b) =>
+                b.timesheet.id.localeCompare(a.timesheet.id)
+            )
+        }))
         .sort((a, b) => b.date.localeCompare(a.date));
-}
+};
 const getWeekYearKey = (date: Date): string => {
     const startOfYear = new Date(date.getFullYear(), 0, 1);
     const daysSinceStart = Math.floor((date.getTime() - startOfYear.getTime()) / (1000 * 60 * 60 * 24));
@@ -62,19 +78,19 @@ const createGroupingFunction = (getKey: GroupingKeyFunction) => (items: Timeshee
     type GroupedMap = Record<string, TimesheetLog[]>;
 
     const grouped = items.reduce<GroupedMap>((acc, item) => {
-        if (!item?.createdAt) {
+        if (!item?.timesheet.createdAt) {
             console.warn('Skipping item with missing timesheet or createdAt:', item);
             return acc;
         }
         try {
-            const date = new Date(item.createdAt);
+            const date = new Date(item.timesheet.createdAt);
             const key = getKey(date);
             if (!acc[key]) acc[key] = [];
             acc[key].push(item);
         } catch (error) {
             console.error(
                 `Failed to process date for timesheet ${item.timesheet.id}:`,
-                { createdAt: item.createdAt, error }
+                { createdAt: item.timesheet.createdAt, error }
             );
         }
         return acc;
